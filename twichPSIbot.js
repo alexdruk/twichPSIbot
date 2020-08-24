@@ -7,41 +7,28 @@ client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {
     if(self) return;
     message = message.trim();
-    console.log('message: '+ message.toLowerCase());
+//    console.log('message: '+ message.toLowerCase());
     let reURL = /(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?/gm;
     let Rurl = message.match(reURL);
     if (Rurl) {
-      console.log(`url ${Rurl} detected`);
+//      console.log(`url ${Rurl} detected`);
       let content = message.toLowerCase().split(" ");
       let command = content[content.length-2];
-      console.log('command='+command);
+//      console.log('command='+command);
       if ((command === '!m-url') || (command === '!d-url') ) {
         let strategy = 'MOBILE';
         if (command === '!d-url') { strategy = 'DESKTOP';}
         const url = setUpQuery(Rurl, strategy);
-        console.log(`query ${url}`);
+        console.log(`query: ${url}`);
         runPSItest(url,channel);
     
       }
-/*
-      client.raw("CAP REQ :twitch.tv/tags")
-        .then((data) => {
-            // data returns [message]
-            console.log(`data=`+data);
-        }).catch((err) => {
-            //
-        });
-*/
-      }
-    else {
-      console.log(`no url detected`);
     }
-  
-	if(message.toLowerCase() === '!hello') {
-        client.say(channel, `/color Chocolate`);
-        client.say(channel, `@${tags.username}, heya &#129409;!`)
-	}
+    else {
+//      console.log(`no url detected`);
+    }
 });
+
 function runPSItest(url,channel) {
   try{
     fetch(url)
