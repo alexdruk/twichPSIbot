@@ -19,7 +19,7 @@ client.on('message', (channel, tags, message, self) => {
         let strategy = 'MOBILE';
         if (command === '!d-url') { strategy = 'DESKTOP';}
         const url = setUpQuery(Rurl, strategy);
-        console.log(`query: ${url}`);
+//        console.log(`query: ${url}`);
         runPSItest(url,channel);
     
       }
@@ -30,7 +30,6 @@ client.on('message', (channel, tags, message, self) => {
 });
 
 function runPSItest(url,channel) {
-  try{
     fetch(url)
     .then(response => {
       if (response.status >= 400) {
@@ -50,12 +49,11 @@ function runPSItest(url,channel) {
           'First CPU Idle': lighthouse.audits['first-cpu-idle'].displayValue,
           'Estimated Input Latency': lighthouse.audits['estimated-input-latency'].displayValue
         };
-        showLighthouseContent(lighthouseMetrics,channel);
+        showLighthouseContent(lighthouseMetrics,channel,url);
+      })
+      .catch(error => {
+        console.error('There has been a problem with your request:', error);
       });
-  }catch (err) {
-    console.error(err);
-    client.say(channel, `${err}`);
-  }
 }
 
 function setUpQuery(url, strategy) {
@@ -72,15 +70,16 @@ function setUpQuery(url, strategy) {
 }
 
 function showInitialContent(id, channel) {
-//  page.textContent = `Page tested: ${id}`;
-  client.say(channel, `Page tested by PageSpeed Insights:`);
-  client.say(channel, `${id}`);
-
+  client.say(channel, `Page tested by PageSpeed Insights: ${id}`);
 }
 
-function showLighthouseContent(lighthouseMetrics,channel) {
-  client.say(channel,"Lighthouse Results:");
+function showLighthouseContent(lighthouseMetrics,channel,url) {
+  let queryparts = url.split('runPagespeed?');
+  let new_url = 'https://developers.google.com/speed/pagespeed/insights/'+'?'+queryparts[1];
+  let msg =`Lighthouse Results: `;
   for (key in lighthouseMetrics) {
-    client.say(channel,`${key}: ${lighthouseMetrics[key]}`);
+    msg += `${key}: ${lighthouseMetrics[key]}; `;
   }
+  client.say(channel,msg);
+  client.say(channel,`For more results see: ${new_url}`);
 }
